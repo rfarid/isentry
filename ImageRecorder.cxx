@@ -40,7 +40,7 @@ void ISentry::ImageRecorder::addFrame(std::pair<cv::Mat,time_t> &m)
             enabled = false; // Disable self
         } else {
             string fname = getFilename(m.second);
-            std::cerr << "Writing " << fname << std::endl;
+            std::cerr << "ImageRecorder::Writing " << fname << std::endl;
             if(!imwrite(fname, m_s))
             {
                 std::cerr << "Error saving to " << fname << std::endl;
