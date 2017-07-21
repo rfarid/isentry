@@ -4,7 +4,8 @@
 
 #include "MotionEstimator.hxx"
 
-#include <opencv2/imgproc.hpp>
+//#include <opencv2/imgproc.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 using namespace cv;
 using namespace std;
@@ -35,7 +36,10 @@ void ISentry::MotionEstimator::addFrame(std::pair<cv::Mat,time_t> &tframe)
     Mat &frame=tframe.first;
 
     Mat bw;
-    cvtColor(frame, bw, CV_BGR2GRAY);
+    if (frame.channels()>=3)
+        cvtColor(frame, bw, CV_BGR2GRAY);
+    else
+        bw=tframe.first;
     
     float scaler = bw.cols/internal_frame_width;
     Size newSize(bw.cols/scaler, bw.rows/scaler);
