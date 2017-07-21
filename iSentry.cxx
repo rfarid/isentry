@@ -27,6 +27,7 @@ public:
         reset();
         namedWindow("preview",1);
         namedWindow("diff",1);
+        namedWindow("With Contours", 1);
         CvPlot::Figure *f = CvPlot::getPlotManager()->AddFigure("motion");
         f->setCustomYRange(0,1);
         float threshold;
@@ -75,6 +76,27 @@ public:
             Mat idiff;
             diff.convertTo(idiff,m.first.type());
             imshow("diff", idiff);
+            /** add_contours */
+            Mat frame_with_contours=frames[0];
+            Mat canny_output;
+            vector<vector<Point> > contours;
+            vector<Vec4i> hierarchy;
+            int thresh = 100;
+            /// Detect edges using canny
+            Canny( idiff, canny_output, thresh, thresh*2, 3 );
+            /// Find contours
+            findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+            /// Draw contours
+            Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
+            for( unsigned int i = 0; i< contours.size(); i++ ) {
+                Scalar color = Scalar( 0, 255, 0 );
+                drawContours( frame_with_contours, contours, i, color, 2, 8, hierarchy, 0, Point() );
+                /* bounding rectangle */
+                Rect rect=boundingRect(contours[i]);
+                rectangle(frame_with_contours,rect,CV_RGB(255,0,0),1,8,0);
+            }
+            imshow( "With Contours", frame_with_contours );
         }
     }
 
@@ -106,7 +128,7 @@ void usage()
 int main(int argc, char**argv)
 {
     int ch;
-
+    std::cerr<<"OPENCV version::"<<CV_VERSION<<std::endl;
     const char *cfile=CONFIG_FILE_NAME;
     while ((ch = getopt(argc, argv, "c:")) != -1)
     {
@@ -185,15 +207,21 @@ int main(int argc, char**argv)
         pair<cv::Mat,time_t> tframe = make_pair(frame,time(NULL));
         isentry.addFrame(tframe);
 
-        int key = waitKey(30);
+        int key = waitKey(1); // 30
         if(key >= 0)
         {
-            if(key=='q')
+            if((char)key=='q') {
+                std::cerr << "Stopping..."<<std::endl;
                 isentry.stop();
-            else if(key=='a')
+            }
+            else if((char)key=='a') {
+                std::cerr << "Starting..."<<std::endl;
                 isentry.start();
-            else
+            }
+            else {
+                std::cerr << "Break..."<<std::endl;
                 break;
+            }
         }
     }
 
