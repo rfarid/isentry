@@ -134,7 +134,7 @@ void Figure::Initialize()
         if(!custom_range_y)
         {
             float *p = iter->data;
-            for (int i=0; i < iter->count; i++)
+            for (unsigned int i=0; i < iter->count; i++)
             {
                 float v = p[i];
                 if (v < y_min)
@@ -287,7 +287,7 @@ void Figure::DrawPlots(IplImage *output)
 			iter->SetColor(GetAutoColor());
 
 		CvPoint prev_point;
-		for (int i=0; i<iter->count; i++)
+		for (unsigned int i=0; i<iter->count; i++)
 		{
 			int y = cvRound(( p[i] - y_min) * y_scale);
 			int x = cvRound((   i  - x_min) * x_scale);
