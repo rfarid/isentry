@@ -42,9 +42,23 @@ void ISentry::VideoRecorder::addFrame(std::pair<cv::Mat,time_t> &m)
             enabled = false; // Disable self
         } else {
             string fname = getFilename(m.second);
-            std::cerr << "Writing " << fname << std::endl;
-            writer=new cv::VideoWriter(fname,CV_FOURCC('D','I','V','X'), 30, m.first.size(), true);
+            std::cerr << "VideoRecorder::Writing " << fname << std::endl;
+            writer=new cv::VideoWriter(fname,CV_FOURCC('D','I','V','X'), 30, m.first.size(), false); // true
             //TODO: error handling
+            /* added by RF */
+            //--- INITIALIZE VIDEOWRITER
+            // VideoWriter writer;
+            // int codec = CV_FOURCC('M', 'J', 'P', 'G');  // select desired codec (must be available at runtime)
+            // double fps = 30.0;                          // framerate of the created video stream
+            // writer.open(fname, codec, fps, m.first.size(), false);
+            // check if we succeeded
+            if (!writer->isOpened()) {
+                std::cerr << "Could not open the output video file for write\n"<<std::endl;
+                return;
+            }
+            cout << "Writing videofile: " << fname << endl;
+            writer->write(m_s);
+            /* added by RF - end */
         }
     } 
 
@@ -70,6 +84,7 @@ void ISentry::VideoRecorder::stop()
     std::cerr << "Closing video segment." << std::endl;
     n=0;
     FrameProcessor::stop();
+    // writer->release(); // added by RF
     if(writer)
     {
         delete writer;
